@@ -13,10 +13,20 @@ export const HomePage = () => {
     const [imgBaseCardUrl, setImgBaseCardUrl] = useState();
     const [imgBackCardUrk, setImgBackCardUrl] = useState();
     const [cards, setCards] = useState([]);
-    // const [backSide, setBackSide] = useState(false);
-    const shuffleCards = () => {
-        // const shuffledCards = 
-    }
+    const shufflingCards = (cards) => {
+        const numeredCards = cards.map((card)=>{
+            return {...card, number: Math.random()}
+        })
+        const shuffledCards = numeredCards.sort((a, b)=> a.number - b.number);
+        return shuffledCards
+    };
+    const makeBackSideCards = (cards) => {
+        
+        const newCards = cards.map((card)=>{
+            return ({...card, visible: false})
+        })
+        return newCards
+    };
     useEffect(()=>{
         axios.get('tarot.json')
             .then(({data}) => {
@@ -27,14 +37,23 @@ export const HomePage = () => {
                 setImgBaseCardUrl(data.imagesUrl)
             })
             .catch(err => console.log(err))
-    },[])
+    },[]);
+    const onClickStartButton = () => {
+        console.log('onClickStartButton');
+        const shuffledCards = shufflingCards(cards);
+        const backSideCards = makeBackSideCards(shuffledCards);
+        setCards(backSideCards);
+        
+    }
     return (
         <HomePageContainer>
             <CardsContainer>
-                {cards.map(card => <CardStyled src={`${imgBaseCardUrl}${card.image}`} />)} 
+                {cards.map(card => card.visible 
+                    ? <CardStyled src={`${imgBaseCardUrl}${card.image}`} /> 
+                    : <CardStyled src={imgBackCardUrk} />)} 
             </CardsContainer>
             <FooterContainer>
-                    <ActionButtonStyled >Começar</ActionButtonStyled>
+                    <ActionButtonStyled onClick={()=>onClickStartButton()}>Começar</ActionButtonStyled>
             </FooterContainer>
         </HomePageContainer>
     )
