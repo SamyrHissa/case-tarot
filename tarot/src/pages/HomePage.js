@@ -7,12 +7,16 @@ import {
 } from './styled';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { Modal } from '../components/Modal';
     
 
 export const HomePage = () => {
     const [imgBaseCardUrl, setImgBaseCardUrl] = useState();
     const [imgBackCardUrk, setImgBackCardUrl] = useState();
     const [cards, setCards] = useState([]);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedCard, setSelectedCard] = useState();
+
     const shufflingCards = (cards) => {
         const numeredCards = cards.map((card)=>{
             return {...card, number: Math.random()}
@@ -39,19 +43,34 @@ export const HomePage = () => {
             .catch(err => console.log(err))
     },[]);
     const onClickStartButton = () => {
-        console.log('onClickStartButton');
         const shuffledCards = shufflingCards(cards);
         const backSideCards = makeBackSideCards(shuffledCards);
         setCards(backSideCards);
         
+    }
+    const onClickCard = (cardSelected) => {
+        const newCards = cards.map((card)=>{
+            if(cardSelected.name === card.name){
+                return {...card, visible: true}
+            };
+            return card;
+        })
+        setCards(newCards);
+        setSelectedCard(cardSelected);
+        setModalVisible(true);
     }
     return (
         <HomePageContainer>
             <CardsContainer>
                 {cards.map(card => card.visible 
                     ? <CardStyled src={`${imgBaseCardUrl}${card.image}`} /> 
-                    : <CardStyled src={imgBackCardUrk} />)} 
+                    : <CardStyled src={imgBackCardUrk} onClick={()=>onClickCard(card)} />)} 
             </CardsContainer>
+            {modalVisible && <Modal onClose={()=>setModalVisible(false)} >
+                                <h1>{selectedCard.name}</h1>
+                                <img src={`${imgBaseCardUrl}${selectedCard.image}`} />
+                            </Modal>
+            }
             <FooterContainer>
                     <ActionButtonStyled onClick={()=>onClickStartButton()}>Começar</ActionButtonStyled>
             </FooterContainer>
