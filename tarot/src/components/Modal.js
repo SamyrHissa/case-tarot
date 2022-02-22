@@ -49,7 +49,7 @@ const ModalContent = styled.div`
         grid-area: img;
         justify-self: center;
     }
-    h5 {
+    h4 {
         grid-area: desc;
     }
     grid-template-rows: 1fr 5fr;
